@@ -1,0 +1,379 @@
+# SQL 
+## SQL通用语法
+- SQL 不区分大小写
+- SQL 语句可以单行或多行书写，以分号结尾。
+- SQL 语句可以使用空格/缩进来增强语句的可读性。
+- MySQL 数据库的 SQL 语句不区分大小写，关键字建议使用大写
+- 注释:
+	- 单行注释:   --注释内容 或   # 注释内容 (MySQL 特有)
+	- 多行注释:  /* 注释内容   * /
+- <span style="background:#fff88f">字符串（最常见的是中文）用单引号括起来‘你好’</span>
+
+##  SQL 语句分类
+
+| 分类  | 全称                         | 说明                          |
+| --- | -------------------------- | --------------------------- |
+| DDL | Data Definition Language   | 数据定义语言，用来定义数据库对象 (数据库，表，字段) |
+| DML | Data Manipulation Language | 数据操作语言，用来对数据库表中的数据进行增删改     |
+| DQL | Data Query Language        | 数据查询语言，用来查询数据库中表的记录         |
+| DCL | Data Control Language      | 数据控制语言，用来创建数据库用户、控制数据库的访问权限 |
+## DDL
+### 查询
+- 查询所有数据库
+	- ```show databases;```
+- 查询当前数据库
+	- ```select database();```
+- 查询当前数据库所有表
+	- ```show tables;```
+- 查询表结构
+	- ```desc 表名;```
+- 查询指定表的建表语句
+	- ```show create table 表名;```
+### 创建
+- ```create database [ if not exists ] 数据库名 [ default charset utf8mb4] [ collate 排序规则 ];```
+	- 通常用 utf8mb4 作为字符集【默认】，因为是 4 字符的，utf8 是 3 字符有些符号不兼容
+- 表操作——创建
+	- ```create table 表名(
+	  字段1 字段1类型 [comment 字段1注释],
+	  字段2 字段2类型 [comment 字段2注释],
+	  字段3 字段3类型 [comment 字段3注释],
+	  ......
+	  字段n 字段n类型 [comment 字段n注释]) [comment 表注释];```
+	![image.png|250](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250617163934.png) ![image.png|250](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250617163951.png)
+- 数据类型图
+	- 数值类型 ![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250617164147.png)
+		- 精度和标度，例如 123.45 精度为 5 （整体长度）标度为 2（小数位数）
+	- 字符串类型 ![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250617164922.png)
+		- Char 和 varchar 异同
+			- 使用的时候要定义长度，如 char (10), 定义了长度为 10
+			- Char (10)的情况下，即使输入的内容不到 10 个字符，也会默认用空格填满 —性能好
+			- Varchar (10)的情况下，如果只输入了 5 个字符，那会计算成 5——性能较差
+	- 日期时间类型 ![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250617165917.png)
+	- 案例
+		- ![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250617170233.png)
+- 表操作——修改
+	- 添加字段
+		- ```alter table 表名 add 字段名 类型（长度） [comment 注释] [约束]；```
+	- 修改字段
+		- 修改数据类型 ```alter table 表名 modify 字段名 新数据类型(长度);```
+		- 修改字段名和字段类型 ```alter table 表名 change 旧字段名 新字段名 类型(长度) [comment 注释] [约束];```
+	- 修改表名
+		- ```alter table 表名 rename to 新表名;```
+### 删除
+- 删除数据库
+	- ```drop database [if exists ]数据库名;```
+- 删除字段
+	- ```alter table 表名 drop 字段;```
+- 删除表
+	- ```drop table [if exsits] 表名;```
+- 删除表并重新建表
+	- ```truncate table 表名;```
+### 使用
+- ```use 数据库名;```
+## DML
+### 添加数据 (INSERT)
+- 给指定字段添加数据
+	- ```insert into 表名 (字段1,字段2,...) values (值1, 值2,...);```
+- 给全部字段添加数据
+	- ```insert into 表名 (值1, 值2,...);```
+- 批量添加数据
+	- ```insert into 表名(字段1, 字段2,...) values(值1,值2,...),(值1,值2,...),...```
+	- ```insert into 表名 values(值1,值2,...)(值1,值2,...),...```
+	- NOTE
+		- 插入数据时，指定的字段顺序需要与值的顺序是一一对应的。
+		- 字符串和日期型数据应该包含在引号中
+		- 插入的数据大小，应该在字段的规定范围内
+		- 可以理解为，(值 1, 值 2,...)代表一个被试的数据
+### 修改数据 (UPDATE)
+- 修改数据
+	- ```update 表名 set 字段1 = 值1 , 字段2 = 值2 ,... [where 条件]```
+	- 条件可有可无，若无条件则说明修改整张表中的数据
+### 删除数据（DELETE）
+- 删除数据
+	- ```delete from 表名 [where 条件]```
+	- NOTE
+		- DELETE 语句的条件可以有，也可以没有，如果没有条件，则会删除整张表的所有数据
+		- DELETE 语句不能删除某一个字段的值 (可以使用 UPDATE)。
+## DQL
+- 语法
+	- ```select``` 字段列表
+	- ```from``` 表名列表
+	- ```where``` 条件列表
+	- ```group by``` 分组字段列表
+	- ```having``` 分组后条件列表
+	- ```order by``` 排序字段列表
+	- ```limit``` 分页参数
+### 基本查询
+- 查询多个字段
+	- ```select 字段1, 字段2, 字段3, ... from 表名;```
+	- ```select * from 表名;``` ——查询所有字段，但是尽量不用*，容易混淆，语义不清
+- 设置别名
+	- ```select 字段1[as 别名1], 字段2[as 别名2], 字段3[as 别名3], ... from 表名;``` ——as 可以省略
+- 去除重复记录
+	- ```select distinct 字段列表 from 表名;```
+### 条件查询
+- 语法
+	- ```SELECT 字段列表 FROM 表名 WHERE 条件列表;```
+- <span style="background:#fff88f">条件</span>
+	- ![image.png|260](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620145604.png) ![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620145652.png)
+		- 查询 age 为 88 的数据 ``` Select * from 表名 where age = 88; ```
+		- 查询 age 大于 15 而小于 20 的数据
+			-  ``` Select * from 表名 where age >= 15 and age <= 20; ```   
+			- ``` Select * from 表名 where age >= 15 && age <= 20; ```  
+			- ``` Select * from 表名 where age between 15 and 20; ``` between 后面根最小值，and 后面跟最大值，反了查找不到
+### 聚合函数
+- 将一列数据作为一个整体，进行纵向计算
+- ```select 聚合函数(字段列表) from 表名;```
+	- Null 空值不计入聚合函数计算
+
+| 分类    | 全称   |
+| :---- | :--- |
+| count | 统计数量 |
+| max   | 最大值  |
+| min   | 最小值  |
+| avg   | 平均值  |
+| sum   | 求和   |
+### 分组查询
+- 语法
+	- ```SELECT 字段列表 FROM 表名[WHERE 条件]GROUP BY 分组字段名[HAVING 分组后过滤条件];```
+	- Where 和 having 区别
+		- 执行时机不同: where 是分组之前进行过滤，不满足 where 条件，不参与分组; 而 having 是分组之后对结果进行过滤。
+		- 判断条件不同: where 不能对聚合函数进行判断，而 having 可以。
+	- NOTE
+		- 执行顺序: where >聚合函数>having
+		- 分组之后，查查询的字段一般为聚合函数和分组字段，查询其他字段无任何意义
+### 排序查询
+- 语法
+	- ```SELEET 字段列表 FROM 表名 ORDER BY 字段 1 排序方式 1, 字段 2 排序方式 2;```
+- 排序方式
+	- ASC: 升序 (默认值)
+	- DESC: 降序
+	- 如果是多字段排序，当第一个字段值相同时，才会根据第二个字段进行排序
+### 分页查询
+- ```SELECT 字段列表 FROM 表名 LIMIT,起始索引, 查询记录数;```
+- NOTE
+	- 起始索引从 0 开始，起始索引=(查询页码-1)每页显示记录数
+	- 分页查询是数据库的方言，不同的数据库有不同的实现，MySQL 中是 LIMIT【不同数据库参数不同】
+	- 如果查询的是第一页数据，起始索引可以省略，直接简写为 limit 10
+- 例子
+	- 查询第一页员工，每页展示 10 条 ```select * from 表名 limit 0,10;```
+	- 查询第二页员工，每页展示 10 条 ```select * from 表名 limit 10,10;```
+		- Limit 10 = （2 页-1）× 每页数 10 条
+### 执行顺序
+![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620153350.png)
+
+## DCL
+- DCL 英文全称是 Data ControlLanguage (数据控制语言)，用来管理数据库用户、控制数据库的访问权限。
+- 管理用户
+	- 查询用户 ```use mysql；
+	  select * from user;```
+	- 创建用户 ```CREATE USER '用户名'@'主机名' IDENTIFIED BY '密码';```
+	- 修改用户密码 ```ALTER USER '用户名'@'主机名' IDENTIFIED WITH mysql native_password BY '新密码';``` 
+	- 删除用户 ```DROP USER '用户名'@'主机名';```
+	- NOTE
+		- 主机名可以使用 %通配
+		- 这类 SQL 开发人员操作的比较少，主要是 DBA（Database Administrator 数据库管理员）使用
+- 控制权限
+	- ![image.png|340](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620154805.png)
+	- 查询权限 ```show grants for'用户名'@'主机名';```
+	- 授予权限 ```grant 权限列表 on 数据库名.表名 to '用户名'@'主机名';```
+	- 撤销权限 ```revoke 权限列表 on 数据库名.表名 from '用户名'@'主机名';```
+
+# 函数
+## 字符串函数
+![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620155745.png)
+## 数值函数
+![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620160301.png)
+## 日期函数
+![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620160716.png)
+## 流程控制函数
+![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620161206.png)
+- 两个 case 的区别
+	- 前者是连续判定，比如判断学生成绩，如果＞80，优秀，如果不是则进一步判断>60，及格，最后才是不及格
+	- 后者是直接判断，例如城市，如果是北京，返回‘一线城市‘，不是则返回其他，如果是上海，返回‘一线城市’，不是则返回其他
+	- 具体可见
+```cardlink
+url: https://www.bilibili.com/video/BV1Kr4y1i7ru?spm_id_from=333.788.videopod.episodes&vd_source=e3837ba3ffbcf2862de659c49538e748&p=30
+title: "30. 基础-函数-流程函数_哔哩哔哩_bilibili"
+description: "30. 基础-函数-流程函数是黑马程序员 MySQL数据库入门到精通，从mysql安装到mysql高级、mysql优化全囊括的第30集视频，该合集共计195集，视频收藏或关注UP主，及时了解更多相关视频内容。"
+host: www.bilibili.com
+image: //i1.hdslb.com/bfs/archive/7e15bb1dc75f9933f9cbe4feac9a0bfbd570e5c0.jpg@100w_100h_1c.png
+```
+
+# 约束
+## 概述
+- 概念: 约束是作用于表中字段上的规则，用于限制存储在表中的数据
+- 目的: 保证数据库中数据的正确、有效性和完整性
+- 分类 ![image.png|260](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620162513.png)
+- NOTE: 约束是作用于表中字段上的，可以在创建表/修改表的时候添加约束
+## 约束演示
+![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620163430.png)
+## 外键约束
+- 外键用来让两张表的数据之间建立连接，从而保证数据的一致性和完整性
+![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620163557.png)
+
+- 语法
+	- 添加外键 
+		- ```CREATE TABLE 表名(
+		  字段名 数据类型
+		   ...
+		   [CONSTRAINT [外键名称] FOREIGN KEY(外键字段名) REFERENCES 主表 (主表列名);```
+		- ```ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY(外键字段名) REFERENCES 主表(主表列名);```
+	- 删除外键
+		- ```ALTER TABLE 表名 DROP FOREIGN KEY 外键名称;```
+- 外键的删除/更新行为 ![image.png|350](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250620164148.png)
+	- ```ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY(外键字段名) REFERENCES 主表(主表列名) ON UPDATE CASCADE ON DELETE CASCADE;``` 
+
+## 多表查询
+### 多表关系
+- 项目开发中，在进行数据库表结构设计时，会根据业务需求及业务模块之间的关系，分析并设计表结构，由于业务之间相互关联，所以各个表结构之间也存在着各种联系，基本上分为三种:
+	- 一对多（多对一）
+	- 多对多
+	- 一对一
+#### 一对多
+- 案例：部分和员工
+- 关系：一个部门对应多个员工，一个员工对应一个部门
+- 实现：<font color="#ff0000">在多的一方建立外键，指向一的一方的主键</font>
+#### 多对多
+- 案例：学生和课程
+- 关系：一个学生可以选修多门课程，一门课程也可以供多个学生选择
+- 实现：<font color="#ff0000">建立第三张中间表，中间表至少包含两个外键，分别关联两方主键</font>
+#### 一对一
+- 案例：用户与用户详情的关系
+- 关系：一对一关系，多用于单表拆分，将一张表的基础字段放在一张表中，其他详情字段放在另一张表中，以提升操作效率
+- 实现：<font color="#ff0000">在任意一方加入外键，关联另外一方的主键，并且设置外键为唯一的 (UNIOUE)</font>
+
+### 多表查询概述
+- 概述：指从多张表中查询数据
+- 笛卡尔积：笛卡尔乘积是指在数学中，两个集合 A 集合和 B 集合的所有组合情况。(<font color="#ff0000">在多表查询时，需要消除无效的笛卡尔积</font>)
+- 实现：将两个表中匹配的列用=进行匹配 (where 后面的内容)
+	- ```select * from emp,dept where emp.dept_id = dept.id;```
+#### 多表查询分类
+- 连接查询
+	- 内连接: 相当于查询 A、B 交集部分数据 ![image.png|260](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621142334.png)
+	- 外连接:
+		- 左外连接: 查询左表所有数据，以及两张表交集部分数据
+		- 右外连接: 查询右表所有数据，以及两张表交集部分数据
+	- 自连接: 当前表与自身的连接查询，自连接必须使用表别名
+- 子查询 
+#### 连接查询
+##### 内连接【查询交集】
+- 查询语法
+	- 隐式内链接 ```SELECT字段列表 FROM 表1,表2 WHERE 条件;```
+		- 	![image.png|260](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621143034.png)
+			- 如果表名过长，想要简化，可以给表名重新命名，但是重新命名完后不能用原表名了——sql 语句的执行顺序
+	- 显式内链接 ```SELECT 字段列表 FROM 表1[INNER]JOIN 表2 ON 连接条件 ...;``` —— inner 可以省略
+		- ![image.png|260](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621143318.png)
+	- 二者关系
+		- 功能和结果完全一致，只是语法表达不同
+		- 当内容较少时，隐式内连接较简洁，更合适，但复杂查询中容易混淆
+		- 显式内连接语法清晰，更易理解【个人推荐，明确不混淆】
+##### 外连接
+- 左外连接（相当于查询表 1 (左表)的所有数据包含表 1 和表 2 交集部分的数据，即左表的全部）
+	- ```SELECT 字段列表 FROM 表1 LEFT [OUTER]JOIN 表2 ON 条件...;``` ——outer 可以省略，下同
+- 右外连接（即右表的全部）
+	- ```SELECT 字段列表 FROM 表1 RIGHT [OUTER]JOIN 表2 ON 条件...;```
+- 二者关系
+	- 左右表可以互换，可以完全等价，因此实操中往往用左外连接
+##### 自连接
+- 自连接查询，可以是内连接查询，也可以是外连接查询，
+	- ```SELECT 字段列表 FROM 表A 别名A JOIN 表A 别名B ON 条件...;```
+	- ![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621144640.png)
+		- 一个表中员工有自己的 ID，然后要查询他的上级是谁，也用 ID 表示，就构成了自连接
+		- 如 2 的上级 ID 是 1；3、4 的上级 ID 是 2
+	- 案例 ![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621145017.png)
+	- 输出结果 ![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621145029.png)
+	- NOTE：
+		- <font color="#ff0000">自连接中表必须起别名</font>，不然不能识别。
+		- 自连接时虽然只有一张表，但要<font color="#ff0000">把它看成 2 张表</font>
+		- 自连接时可以用内连接，也可以用外连接，看需求
+##### 联合查询
+- 对于 union 查询，就是把多次查询的结果合并起来，形成一个新的查询结果集。
+	- ```SELECT 字段列表 FROM 表A...
+	  UNION [ ALL ]
+	  SELECT字段列表 FROM 表B...;```
+	- 案例 ![image.png|300](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621151051.png)
+	- NOTE
+		- <font color="#ff0000">Union all 是直接将两个表内容重合，可能出现两次同样结果</font>
+		- Union 则可以去重
+		- <font color="#ff0000">对于联合查询的多张表的烈数必须保持一致，字段类型也需要保持一致</font>
+#### 子查询
+- 概念: SOL 语句中嵌套 SELECT 语句，称为嵌套查询，又称子查询 【函数的嵌套】
+	- ```SELECT * FROM t1 WHERE column1 = (SELECT column1 FROM t2 );```
+- 根据子查询结果不同，分为:
+	- 标量子查询 (子查询结果为单个值)
+	- 列子查询 (子查询结果为一列)
+	- 行子查询 (子查询结果为一行)
+	- 表子查询 (子查询结果为多行多列)
+- 根据子查询位置，分为: 
+	- WHERE 之后
+	- FROM 之后
+	- SELECT 之后
+##### 标量子查询
+- 子查询返回的结果是单个值 (数字、字符串、日期等)，最简单的形式，这种子查询成为标量子查询
+- 常用的操作符:
+	-  =   <>   >  >=  <  <=
+##### 列子查询
+- 子查询返回的结果是一列 (可以是多行)，这种子查询称为列子查询
+- 常用的操作符:
+	- IN、NOTIN、ANY、SOME、ALL ![image.png|260](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621152505.png)
+##### 行子查询
+- 子查询返回的结果是一行 (可以是多列)，这种子查询称为行子查询
+- 常用的操作符:
+	- =、<>、IN、NOTIN
+##### 表子查询
+- 子查询返回的结果是多行多列，这种子查询称为表子查询
+- 常用的操作符:
+	- IN
+
+# 事务
+## 事务简介
+- 事务是<font color="#ff0000">一组操作的集合</font>，它是一个不可分割的工作单位，事务会把所有的操作作为一个整体一起向系统提交或撤销操作请求，即这些操作要么同时成功，要么同时失败。
+	- 例如，银行转账 ![image.png|350](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621160729.png)
+	- NOTE：
+		- <font color="#ff0000">默认 MySQL 的事务是自动提交的</font>，也就是说，当执行一条 DML 语句，MSQL 会立即隐式的提交事务。
+
+## 事务操作
+- 方式一
+- 查看/设置事务提交方式
+	- ```SELECT @@autocommit;```——看事务的提交方式，是否自动提交， 1 是自动提交，0 为手动
+	- ```SET @@autocommit=0;``` ——设置成手动提交事务
+- 提交事务
+	- ```COMMIT;```
+- 回滚事务
+	- ```ROLLBACK;```
+- 方式二：或者使用开启事务→提交事务→回滚事务的方式
+	- ```START TRANSACTION;``` 或 ```BEGIN;``` ——开启事务
+## 事务四大特性
+- 原子性 (Atomicity): 事务是不可分割的最小操作单元，<font color="#ff0000">要么全部成功，要么全部失败</font>。
+- 一致性 (Consistency): 事务完成时，必须使<font color="#ff0000">所有的数据都保持一致状态</font>
+- 隔离性 (lsolation): 数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行。
+- 持久性 (Durability): 事务一旦提交或回滚，它对数据库中的数据的改变就是永久的。
+
+## 并发事务问题
+- 脏读
+	- 一个事务读到另外一个事务还没有提交的数据
+		- 事务 A 第二步更新了 ID=1 的数据，但还没有提交 → 此时事务 B 第一步读取了 ID=1 的数据，所以读取的是事务 A 更新后的数据 ![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621163956.png)
+- 不可重复读
+	- 一个事务先后读取同一条记录，但两次读取的数据不同，称之为不可重复读。
+		- 事务 A 第一步是读取了 ID=1 的数据 → 然后事务 B 提交了更新 ID=1 的数据 → 在事务 A 的第三步中又读取了 ID=1 的数据，导致两次读取结果不一致 ![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621164200.png)
+- 幻读
+	- 一个事务按照条件查询数据时，没有对应的数据行，但是在插入数据时，又发现这行数据已经存在，好像出现了“幻影”
+		- 事务 A 先查询了 ID=1 的数据，显示没有 → 此时，事务 B 插入了一个 ID=1 的数据 → 事务 A 第二部也要插入 ID=1 的数据，却显示已经有了 → 此时解决了不可重复读的问题（??？） → 事务 A 第三步再查询 ID=1 的数据，却又显示没有该数据，像幻影 ![image.png](https://gitee.com/ke-panfeng/tuchuang/raw/master/img/20250621164647.png)
+## 事务隔离级别
+- 用于解决并发事务所带来的问题
+
+| 隔离级别                | 脏读     | 不可重复读 | 幻读  |
+| :------------------ | :----- | ----- | --- |
+| Read uncommitted    | √（会出现） | √     | √   |
+| Read committed      | ×      | √     | √   |
+| Repeatable read（默认） | ×      | ×     | √   |
+| serializable        | ×      | ×     | ×   |
+- 查看事务隔离级别
+	- ```SELECT @@TRANSACTION ISOLATION;```
+- 设置事务隔离级别
+	- ```SET [SESSIONI | GLOBAL] TRANSACTION ISOLATION LEVEL {READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE};```
+	-  | 代表或
+- NOTE
+	- <font color="#ff0000">事务隔离级别越高，数据越安全，但是性能越低</font>。
+	- <font color="#ff0000">一般采用默认，不会去改</font>
